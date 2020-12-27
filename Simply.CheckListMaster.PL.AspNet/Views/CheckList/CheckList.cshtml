@@ -1,0 +1,97 @@
+﻿@model IEnumerable<Simply.CheckListMaster.PL.AspNet.Models.CheckLists.CheckModel>;
+
+@{
+	ViewData["Title"] = "Index";
+
+	const int processingState = 1;
+}
+
+<h1>My Checklist</h1>
+
+<p>
+	<a asp-action="Create">Create New</a> |
+	<a>@Html.ActionLink("My categories", "Index", "Category")</a>
+</p>
+<form method="post" style="display: flex; align-items: center;">
+	@Html.DropDownList(
+		"categoryId",
+		ViewBag.Categories as SelectList,
+		"All (Categories)",
+		new { @class = "form-control" }
+	)
+	@Html.DropDownList(
+		"stateId",
+		ViewBag.States as SelectList,
+		"All (States)",
+		new { @class = "form-control" }
+	)
+	<input type="submit" value="Select" class="btn btn-primary" />
+</form>
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayNameFor(model => model.Title)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Discription)
+			</th>
+			<th>
+				Start date
+			</th>
+			<th>
+				End date
+			</th>
+			<th>
+				State
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Category)
+			</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model) {
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.Title)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Discription)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.StartDate)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.EndDate)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.State)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Category.Name)
+				</td>
+				<td style="display: flex; align-items: center;">
+					<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+					<form asp-action="Delete" asp-route-id="@item.Id">
+						<input type="submit" value="Delete" class="btn btn-danger" />
+					</form>
+					@if (!item.IsCompleted) {
+						if ((int)item.State == processingState) {
+							<form asp-action="Complete" asp-route-id="@item.Id">
+								<input type="submit" value="Complete" class="btn btn-success" />
+							</form>
+						}
+						else {
+							<form asp-action="Run"
+								  asp-all-route-data="@(new Dictionary<string, string> { { "userId", item.UserId }, { "id", item.Id.ToString() } })">
+								<input type="submit" value="Start" class="btn btn-success" />
+							</form>
+						}
+					}
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
